@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Echoes of a Feathered Pen</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #f6f3ea;
+      font-family: 'Georgia', serif;
+      color: #2b2b2b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: min-content;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    header {
+      text-align: center;
+      margin: 30px 0 20px 0;
+      max-width: 600px;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      color: #1a252f;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    header p {
+      font-style: italic;
+      color: #6e6e6e;
+      font-size: 1rem;
+    }
+    .counter {
+      font-size: 0.9rem;
+      color: #8c764d;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+    .book-container {
+      position: relative;
+      width: 100%;
+      max-width: 550px;
+      height: 580px;
+      perspective: 1500px;
+      margin-bottom: 25px;
+    }
+    .page {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #fcfbf7;
+      border: 1px solid #e3dec3;
+      border-radius: 4px;
+      padding: 40px 35px;
+      box-shadow: 0 10px 25px rgba(140, 118, 77, 0.08), 0 2px 6px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, visibility 0.6s;
+      backface-visibility: hidden;
+      transform-origin: left center;
+      opacity: 0;
+      visibility: hidden;
+    }
+    .page.active {
+      opacity: 1;
+      visibility: visible;
+      transform: rotateY(0deg);
+      z-index: 2;
+    }
+    .page.flipped {
+      transform: rotateY(-140deg);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1;
+    }
+    .poem-title {
+      font-size: 1.4rem;
+      color: #34495e;
+      text-align: center;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px dashed #e3dec3;
+      padding-bottom: 12px;
+    }
+    .poem-content {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      text-align: center;
+      white-space: pre-line;
+      color: #333333;
+      font-style: italic;
+    }
+    .navigation {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .btn {
+      background-color: #8c764d;
+      color: #ffffff;
+      border: none;
+      padding: 10px 24px;
+      font-family: 'Georgia', serif;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    .btn:hover {
+      background-color: #735f3b;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .page::-webkit-scrollbar {
+      width: 4px;
+    }
+    .page::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .page::-webkit-scrollbar-thumb {
+      background: #e3dec3;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Echoes of a Feathered Pen</h1>
+    <p>A digital anthology compiled by Mrs. Jeyanthi Ravichandran</p>
+  </header>
+
+  <div class="counter" id="pageCounter">Loading...</div>
+
+  <div class="book-container" id="book">
+    <div id="page1" class="page active"></div>
+    <div id="page2" class="page"></div>
+  </div>
+
+  <div class="navigation">
+    <button class="btn" id="prevBtn" disabled>Previous Poem</button>
+    <button class="btn" id="nextBtn">Next Poem</button>
+  </div>
+
+  <script>
+    const poemsList = [
+      {
+        title: "1. Covid Corona",
+        text: `Covid Corona\nHow cruel you are na!\nYou are so grave and clueless.\nBut remember....\nWe too are flawless.\nSelf control, self awareness\nAnd most importantly self isolation\nAre a few measures\nThat to be adopted.\nLet's be serious and socially responsible.\nLet's be determined to drive away\nThis pandemic panic!\nUnited we stand\nUnanimously we adhere....\nSurely can overcome this epidemic!\nKudos to the service of the nation!\nHats off to the selfless volunteers' notion!\nLet's adore and adhere Janata Curfew!\n22nd March is the World Water Day.\nLet the day be a complete blackout!\nAgainst the craving Corono Virus!\nLet's do a bit from our side..\nAnd make it a grand success..\nBe humane and spread humanity!`
+      },
+      {
+        title: "2. Corona",
+        text: `CORONA\n\nThis tiny and almost invisible particle..\nHas indeed proven to be a miracle!\nIs this called Nature's Fury?\nOf course it is! proclaimed the jury.\nWhat can be the solution?\nStay at Home... is the resolution.\nIs it possible to be confined?\nWhy not if to be refined?\nThis absolutely reminds me of Anne Frank..\nOh.. No! not even as a prank..\nWhat we give will be got back is the theory.\nOnce again it has to be nailed in our memory.\nLet this always reverberate..\nBefore it becomes too late.\nMay we not be as Hamlet's 'to be or not to be',\nTake a call.. Unify and be free.`
+      },
+      {
+        title: "3. Covid vs Motherhood",
+        text: `COVID VS MOTHERHOOD\n\nStay at Home... to be safe\nIt is a blessing in disguise!\nSpecially for the mothers like me.\nComplete lock down has unlocked my creativity\nNow I could just reinvent my regular activity\nReading and writing and knitting\nAnd obviously cooking!\nThat too for my kids...\nApart from cuddling and muddling\nWe could spend the whole time together\nIsn't it a blessing in disguise?\nI wonder if this chance would come again!\nSo I have decided to use it to my heart's gain.`
+      },
+      {
+        title: "4. Cool Cuisine",
+        text: `COOL CUISINE\n\nThe daybreak commences with a juice\nThat too full of muse!\nCucumber, coriander or mint\nWith an added tint.\nCabbage, lemon or pumpkin\nWill definitely bring glow in skin,\n\nThis daybreak culminates with a yummy breakfast!\nIdli, dosa or upma\nPuri, pulav or roti\nThus goes on the variety..\nCrunchy Munchy snacks at brunch!\nLater does the tummy need a lunch?`
+      },
+      {
+        title: "5. My Mom",
+        text: `MY MOM\n\nMy mother is at seventy eight,\nStill she is very strict,\nShe is for me a gift,\nI preserve it without a rift,\n\nYet she hasn't become oblivion,\nNeither an irregular civilian.\nNever deviated from her routine,\nShe'll ever remain the chatelaine.\n\nHer day starts even before seven.\nShe treats this abode a heaven.\nWatching all the serials is her hobby\nNone can interfere beyond the lobby.\n\nAt times I scare to stare\nEspecially when she dozes on easy chair.\nShe looks like a corpse\nWhich I wish to get it lapse.\n\nShe has her own plus and minus\nHowever in my life she is a bonus.\nI wish to keep her at ease\nIn whatever may be the case.\n\nWe are mere players in this universe,\nAnd old age is a sheer curse.\nI pray thee God!\nNever ever make me too old.`
+      },
+      {
+        title: "6. Leisure",
+        text: `LEISURE\n\nGetting up at a leisure...\nWow! What a great pleasure!\nThere's no where to rush...\nNo need to say hush!\nEverything is as per my wish!\n\nWho said uncontrollable is time?\nIt's now under my chime!\nThere's no time to stand and stare.\nSorry Mr. Davis, I dare!\nTo say, my life is full of care....`
+      },
+      {
+        title: "7. Walkathan",
+        text: `WALKATHAN\n\nComplete lock has compelled\nThe whole world to a stand still!\nIt has made the life helter-skelter\nAnd a great havoc caused the life hell!\nThe pathetic plight of the Labour...\nWho seek solace and shelter\nAre on the march of walkathan..\nThey're well aware.....\nEast or West home is the best!\nEven the crafty corona would wonder\nTo see their guts and willpower!\nThe languid labourers lament\nAnd opine that before the touch of corona\nHunger would munch them like hyena!\nLet's extend our helping hands\nBefore they really die of hunger!`
+      },
+      {
+        title: "8. Home Coming",
+        text: `HOME COMING\n\nStray dogs roaming freely on the road..\nQuestioning each other on board..\nWhat happened to the human?\nWhy don't they appear in common?\nHave they been caught by the municipality?\nLeaving us in practicality!\nSocial distancing has made the wild to step in hone..\nHome Quarantine dare them to hip hop on tune..\nInviting their kiths and kins for a toast\nThey celebrate their home coming.\nThey do become nostalgic to their habitat..\nAnd owe their gratitude to the Almighty for justice, though late!`
+      },
+      {
+        title: "9. Humanity",
+        text: `HUMANITY\n\nG20's gentle gesture..\nRBI's relentless relaxation..\nRatan Tata's rational rapport..\nAkki's applauding approach..\nPM's powerful policies..\nCentral and State Governments\ngratifying grants..\nPoliticians' proactive proclamation..\nCelebrities' solicitous solidarity..\nHave all proved that humanity\nIs still prevailing on the earth!`
+      },
+      {
+        title: "10. My Archangels",
+        text: `MY ARCHANGELS\n\nLife is very beautiful..\nAnd it becomes more colourful\nWhen we have blooming buds,\nThat roam around us with thuds!\n\nMy bustling birds always chirrup..\nAnd tune me to cheer up.\n\nTheir tweets are as sweet as honey..\nThat can't be matched with any money!\n\nThey have sprawled in my life spring..\nThat's added flapper to my wing!\n\nYes I do at times yell..\nAt once they cast on me a spell!\n\nI'm overwhelmed to have two gems..\nAnd always proud to be their helm.\n\nDon't know what'll be their future?\nBut I'm damn sure about my holistic nurture!`
+      },
+      {
+        title: "11. Truth Ever Wins",
+        text: `TRUTH EVER WINS\n\nAll Fridays are auspicious..\nBut this Friday is very serious!\nThis is the day when a sacred heart\nWas crucified like a brute!\n\nThe Satans celebrated it as a victory\nUnaware that it was just temporary!\nWhen the demons devise a plan\nThe Deity delegates its clan.\n\nHe ensures that the truth reveals\nWhenever on the earth's evil prevails!\nTo prove good over evil\nHe comes back again and again from the hail!`
+      },
+      {
+        title: "12. Isolation",
+        text: `ISOLATION\n\nSelf isolation is indeed a curse.\nHow long will we be looking at each other?\nWish to go out with my purse..\nAnd to reckon my pals together.\n\nJust two weeks of quarantine\nWe aren't able to maintain!\nBehold the caged ones!\nWhat would be their tones?\n\nLet's keep ourselves in their shoes..\nAnd try to sort out these issues.\nAfter all we are in the country of democracy!\nSo why don't we have the equal tendency?`
+      },
+      {
+        title: "13. The Saviours",
+        text: `THE SAVIOURS\n\nWe stay at home..\nSo that you be on duty!\nWe are advised of social distancing..\nBut you socially and emotionally treat the victims.\n\nHow selfless your service is!\nLeaving your home and family\nYou do risk your precious life..\nNo words to utter on your humility!\n\nThe trauma you go through both physically and mentally\nWe could sense as the silent onlookers..\nkudos to your dedication..\nYour sacrifice will definitely be applauded!\n\nKudos! Dear medical practitioners\nPolice personnels\nCleaning staff\nAnd all those who render their service!`
+      },
+      {
+        title: "14. An Elegy on Earth",
+        text: `AN ELEGY ON EARTH\n\nWorld Earth Day is on 22nd April..\nShall we all celebrate it with an appeal?\nThe theme for 2020 is change in climate..\nWhich we are facing now as our fate.\n\nScientists predict the earth is elliptical..\nAnd it remains always a miracle!\nSome say its shape is round..\nBut the sources available are abound!\n\nThe present scenario depicts the deadly outcome!\nWhat have we done in ransom?\nIt seems patience has lost its patience..\nAnd buried in deep silence.\n\nDear earth, you are worshipped as mother..\nCan a mother be so an ill augur?\nDo spare us from your furious fury..\nBless us once again to be cheery!`
+      },
+      {
+        title: "15. Royal Robin",
+        text: `ROYAL ROBIN\n\nRoaming all the way round and round..\nFinally in front of me I found.\nIt heralds me at vespers nine..\nWith its sweet melancholy strain!\n\nI could very well sense its enjoyment,\nAs it's been freed from its confinement.,\nAnd dare to query about mine!\nWhile Indicating its presence with a sign.\n\nBeware the ides of May! my dear royal robin.\nYou could be captured in someone's cabin!\nUntil then, as you wish roam around the city..\nBut never forget to visit in my vicinity!`
+      },
+      {
+        title: "16. My Best Companion",
+        text: `MY BEST COMPANION\n\nA book for some,is a mere compile of pages to engage..\nFor the others it is a great source of knowledge.\nBeing the latter, I love reading all genre for pleasure,\nAnd it enlightens my wit at its own leisure.\n\nA pulp of papyrus prophesies its propitious plight,\nWhen it reaches in the hands of persons right.\nA sheet of paper gives a flight to Utopia,\nAnd spells to be oblivious from all the phobia!\n\nA glance at the books grapples my attention,\nAnd a touch transports me to the heaven.\nI long to visit again and again the library,\nJust to be in the jocund company of treasury!\n\nMark! a book can prove to be a masterly mascot,\nAnd it indeed transforms an ogre to an ardent elite!\nReading begins from a series of listening choice,\nHence, list... repeat... rejoice and rejuvenate!`
+      },
+      {
+        title: "17. Incredible India",
+        text: `INCREDIBLE INDIA\n\nIndeed Indians are incredible..\nTheir quest for liquor is so horrible!\nWhen they willingly surrender to the destiny..\nEven this silly corona can't create a mutiny!\n\nWhat a great queue!\nHow desperate their view!\nFor them rules are set to violate..\nIs this not a self mutilate?`
+      },
+      {
+        title: "18. Proud Prudence",
+        text: `PROUD PRUDENCE\n\nLabourers are labelled so..\nAs they actually toil more.\nThe sweat in the soil they sow..\nMake any nation to soar!\n\nWe can adore them..\nAs the heart beat of a country..\nThe remote control of the brain.. ..\nBasement of any industry..\nThe granary of untold pain..\n\nThese unsung heroes..\nDeserve loads of appreciation..\nNever to treat as zeroes!\nKeep them at an amicable association!`
+      },
+      {
+        title: "19. Lasting Impressions",
+        text: `LASTING IMPRESSIONS\n\nThis lock down let me throw back my memories..\nThat was full of merry but no worries.\nThere the children were so cute and innocent..\nAt our beck and ever ready to give consent.\n\nBut when they grow why do they contradict?\nNo one ever could predict!\nHere I paused.. perused... perceived..\nFinally I could conclude!\n\nLove with expectations lasts no longer\nTo make the bonding even more stronger..\nLet them have their own individuality..\nAt any cost never to lose their identity!\n\nWhat do we bring when we are born?\nAnd what do we take while we burn?\nIf we understand this prima facie..\nLife becomes so easy!\n\nLet's shower unconditional love to our posterity!\nPledge this to be the priority..\nLet's set an example with our deeds..\nAnd plant in their mind healthy seeds.`
+      },
+      {
+        title: "20. Nobel Laureate",
+        text: `NOBEL LAUREATE\n\nWe all are born with a reason..\nOnly a few could attain the ultimate crown.\nOne among those is better known as Gurudev..\nWho, through his literature tried to save.\nBestowed with the prestigious Nobel Prize..\nFor Gitanjali, his collection of poems.\nBoldly returned back the Knighthood Title\nTo protest against the Jallianwala Bagh massacre!\n'Where the mind is without fear' he proclaimed once..\nAnd set his life an example till his last ounce.\nPersuaded the people to hold their head high..\nReally one should introspect with a sigh!\nThe proud founder of the Shantiniketan..\nWhich serves sincerely as an excellent baton.\nThis land is incredible with such a legendary..\nLet's be pensive and wrought a rightful revolutionary!`
+      },
+      {
+        title: "21. Passionate Public",
+        text: `PASSIONATE PUBLIC\n\nHow dedicated are the Indian citizens!\nNeither the sun nor the rain could shake their determination.\nHow focussed is their passion towards the liquor!\nEven the natural phenomena couldn't succour.\n\nThe nation needs revenue direly..\nTo cope up with the pandemic a bit freely.\nSelling poison to save the people!\nWhat an ironical principle!\n\nSocial Distancing has now become so called..\nAnd the tyrant corona is gleefully spread.\nIf everyone thinks who will bell the cat?\nThen, even the Almighty can't change our fate!`
+      },
+      {
+        title: "22. The Lady with the Lamp",
+        text: `The Lady with the Lamp\n\nFlorence Nightingale, the pioneer of modern nursing..\nInspired many to undertake this servicing.\nFondly known as the lady with the lamp..\nAs she nursed the wounded even in darkness at the camp.\nHer compassion set her apart from the rest..\nAs service to the needy quenched her thirst.\nHelping the sick and poor was her only aim..\nThis has bestowed her name and fame.\nHer legacy is reflected even today..\nAs the frontliners'encounter is on full display.\nThe current outbreak of COVID 19 issue..\nHas unfurled the mercy on the patients to pursue.\nLet's honour the nurses!\nAs this profession needs a lot of patience.\nHats off to your selfless service to the mankind!\nAnd truly You all are the ladies with the lamp.. mind!`
+      },
+      {
+        title: "23. Prayer",
+        text: `Prayer\n\nWhat's going on in the nation?\nNone has any clear notion!\n\nPoisonous gas leak at Vizag..\nHas shrilled the whole country in snag!\n\nBoiler Plant burst in Neyveli..\nHas forced the people to stay gingerly.\n\nPassenger train mishap at Aurangabad.\nHas stimulated to work with the squad.\n\nHeavy hail storm at Nainital..\nHas blanketed the entire city with its shawl.\n\nRansom rainfall in the south..\nHas wrought mirth along with dire dearth.\n\nDrastic dust storm in the capital city..\nHas stunned the inhabitants and compelled hasty.\n\nAircraft crash at Jalandhar..\nHas provoked the defence to check the sensor.\n\nWhen the crafty corona is vigilantly active..\nThese unforeseen incidents deviate our motive.\n\nHave mercy! We pray thee God!\nAnd culminate this ghastly episode.`
+      },
+      {
+        title: "24. Ode to Mothers",
+        text: `ODE TO MOTHERS\n\nMother.. the mere word itself soothes the soul\nMOTHER, from my point of view,\nCan be defined anew..\nShe is....\nMarvel... as brings forth a new life to this world\nOnyx... as she is systematic with different layers\nTeacher... starts preaching her child even in the womb!\nHealer... as her laps readily heal any wounds..\nEpitome... as she is a pile of noble qualities..\nReservoir... as she reserves medicine for physic and solution for psychic!\nHence let's adore and applaud the living goddess..\nAll around the three sixty five days!`
+      },
+      {
+        title: "25. Eid - Ul - Fitr",
+        text: `EID - UL - FITR\n\nThe holy month of Ramadan..\nKnown for its fast from dusk to dawn,\nSincerely starts with suhoor..\nAnd culminates with iftar.\n\nEid, the feast of breaking the fast,\nContinues till the month's last,\nIt's actually a test for self-control,\nThat is strictly adhered as a rule.\n\nDiscarding all the ill habits..\nFocussing on the spiritual lights..\nWaiting for the crescent's sight..\nHats off! to all for your might.`
+      },
+      {
+        title: "26. Anti Terrorism",
+        text: `ANTI TERRORISM\n\nTerrorism against the communal community..\nRevenge on our very own fraternity!\nAll are our brothers and sisters..\nWe all are one in clusters.\n\nEye for an eye and blood for blood..\nIs this called a victory in solid?\nTit for tat is not at all the conclusion..\nDiscard this stupid thought in seclusion.\n\nShred away Shylock's demand on pound of flesh..\nLet's forgive and forget and be fresh!\nAnimosity is not seen even amongst animals..\nProve that we're superior amidst mammals.\n\nLife is so precious..\nHandle it with ultimate cautious..\nLeave a lasting impression to the posterity..\nWith the good deeds to the humanity!`
+      },
+      {
+        title: "27. Super Cyclone Amphan",
+        text: `SUPER CYCLONE AMPHAN\n\nLo! one more agent of nature..\nReady with open arms to capture!\nThe nation is not in a position to face this rupture..\nThat could cause extensive damage to the structure.\n\nStrong waves lashed away the coast..\nHigh tide alert is on boast..\nMillions are evacuated from their host..\nThus nature is indeed relishing its own toast!\n\nThis extremely severe cyclone storm..\nWith gusting and howling wind in form..\nMore or less similar to Fani in norm..\nHas dumped everyone in alarm!\n\nWhile dealing with the twin disasters COVID and Amphan..\nThe former insists to stay at home..\nThe latter drives away for the wholesome..\nWhat an ironical outcome!`
+      },
+      {
+        title: "28. Family",
+        text: `Family\n\nInternational Family Day\nFather And Mother I Love You!\n\nWe share and care at all times..\nNever break this tie even at rimes!\nExperienced elders enrich us with their wisdom..\nThis is better known as our custom!\nProblems are aired and discussed amidst..\nAnd fetches fruitful findings leaving the worst.\nWe explore a lot from the grandparents folklore..\nThat fills with noble thoughts in the mind's floor.\nDerive decision making from the fonding father..\nManagement magic from the mindful mother..\nHealthy disputes and arguments with the sibling..\nEnhance the bond and avoid great nibbling!\nTogether we make a small world..\nAnd this is christened in the letters of gold..\nF A M I LY\nFabulous Assembly Mingled In Laudable Yearns!`
+      },
+      {
+        title: "29. Global Communications",
+        text: `GLOBAL COMMUNICATIONS\n\nCommunication, you're a mode of sharing our thought.\nAnd the most magnificent tool that we've sought.\nWithout you we're totally incomplete..\nWith you, we earn a lot of treat.\nYet, you're a puppet in our hands..\nAnd can make everything topsy-turvy in a few seconds.\nYou've paved a global platform..\nOn which, a lot more we perform.\nYou've an enormous power to transform the culture..\nWe've been witnessing since ages your nature.\nYou play a promising role in promoting human dignity..\nAnd that has boosted everyone's agility.\nHat's off to your solemn service!\nWe'll utilise you for the betterment, it's a promise!`
+      },
+      {
+        title: "30. World No Tobacco Day",
+        text: `WORLD NO TOBACCO DAY\n\n31st May is the World No Tobacco Day.\nLet's keep the dangerous drugs away.\nWhy do the human consume poison?\nThat too without any correct reason!\n\nSmoking cigarettes soot the soft lungs.\nAnd chew of tobacco triggers the cancerous tongues.\nLife is very precious and gorgeous.\nHandle it with ultimate cautious.\n\nProtect the youth from industry manipulation.\nAnd prevent them from using tobacco and nicotine usage.\nLet's focus on our beautiful health.\nAs health is always our primary wealth!`
+      },
+      {
+        title: "31. Environment Day",
+        text: `ENVIRONMENT DAY\n\nWorld Environment Day is on 5th June.\nLet's tune ourselves to clear the dust soon.\nTime for Nature is the theme for 2020.\nWhich indeed has items available in plenty.\n\nCelebrate Biodiversity with utmost care.\nAnd to destroy its species never dare.\nWe are completely dependent on the ecosystem.\nThen why are we violating its custom?\n\nLet's plant more trees to get rain.\nBefore our lives go in down the drain.\nLet's preserve our nature from being toxic.\nAnd try to avoid things that are plastic!`
+      },
+      {
+        title: "32. Ocean Day",
+        text: `OCEAN DAY\n\n8th June is designated as World Ocean Day.\nTo honor, protect, and conserve its spray.\nInnovation for a Sustainable Ocean is the theme.\nWhich we need to implement as a team.\n\nOceans are the lungs of our planet.\nProviding most of the oxygen we get.\nThey are a major source of food and medicine.\nAnd a critical part of the biosphere we live in.\n\nLet's stop polluting them with our trash.\nBefore the marine life undergoes a complete crash.\nLet's pledge to save our deep blue sea.\nAnd keep its beautiful creatures wild and free!`
+      },
+      {
+        title: "33. Music",
+        text: `MUSIC\n\nMusic is the soul of our life.\nThat helps us to survive in any strife.\nIt has a sweet, melodious, and deep texture.\nThat can easily cure any mental rupture.\n\nIt transcends all boundaries of language and land.\nAnd unites everyone like an unseen band.\nWhether it is classical, pop, or a simple tune.\nIt can turn a dark day into a bright June.\n\nLet's listen to the rhythms of the universe.\nAnd find solace in its magical verse.\nMusic is indeed a divine gift to mankind.\nThat fills with peace both body and mind!`
+      },
+      {
+        title: "34. Child Labour",
+        text: `CHILD LABOUR\n\nChildren are the beautiful buds of our nation.\nThey deserve education, not working exploitation.\nWorld Day Against Child Labour is on 12th June.\nLet's change this pathetic plight very soon.\n\nInstead of holding pens and books in their hand.\nThey are forced to work across the dusty land.\nTheir innocent childhood is completely lost.\nTo benefit the greedy industries at any cost.\n\nLet's protect our youth from this grave sin.\nAnd help them a bright, secure future to win.\nLet's say a strict NO to child labour today.\nAnd guide them safely onto a better path away!`
+      },
+      {
+        title: "35. Nature's Bounty",
+        text: `NATURE'S BOUNTY\n\nNature has bestowed us with gifts galore.\nFrom the green mountains to the blue shore.\nBut human greed has cross-examined its bounty.\nLeaving the ecosystem in a critical jeopardy.\n\nThe gentle rivers, the fresh morning breeze.\nThe birds chirping high up on the dense trees.\nAll are calling us to pause and reflect.\nAnd treat our mother earth with deep respect.\n\nLet's not trigger her furious fury anymore.\nAnd try to heal her wounds from the core.\nLet's live in complete harmony with the wild.\nAnd protect its beauty for every single child!`
+      },
+      {
+        title: "36. Blood Donation",
+        text: `BLOOD DONATION\n\nWorld Blood Donor Day is on 14th June.\nLet's join this noble cause very soon.\nSafe blood saves lives is the main slogan.\nThat should be spread to each and every human.\n\nA single drop of blood can bring back a smile.\nAnd extend a precious life for a longer while.\nIt costs nothing but gives a supreme satisfaction.\nOf doing a selfless, humanitarian action.\n\nLet's break all myths and step forward to donate.\nBefore it becomes too late for someone's fate.\nBe a hero, save a life with your noble deed.\nAnd help the patients who are in desperate need!`
+      },
+      {
+        title: "37. Yoga",
+        text: `YOGA\n\nInternational Day of Yoga is on 21st June.\nLet's align our body and mind to its tune.\nYoga for Health - Yoga at Home is the core.\nTo boost our inner immunity more and more.\n\nIt is not just a simple physical exercise.\nBut a path to make us spiritually wise.\nIt creates a beautiful balance inside our soul.\nAnd helps us to achieve our life's ultimate goal.\n\nLet's practice the asanas with ultimate devotion.\nTo control our daily stress and chaotic emotion.\nYoga is India's ancient, divine gift to the earth.\nThat fills our existence with a healthy, new birth!`
+      },
+      {
+        title: "38. THE REAL REALM",
+        text: `THE REAL REALM\n\nPeople are the real asset of any nation..\nThey strengthen the status in all salutation..\nIncrease in population has its own pros and cons..\nMark! the cons would lead the country's mourns.\n\nThe power of population lies in productivity..\nIt should never be landed in sheer futility.\nThe growth grooms and blooms the economy..\nThat can be obtained in accurate anatomy.\n\nNevertheless, human means emotion and ethic..\nAll the endeavours epitomise its mythic..\nLet's be optimistic and uplift the country..\nAnd be the first in safeguarding as sentry.\n\n- Jeyanthi`
+      },
+      {
+        title: "39. NEW ARRIVAL",
+        text: `NEW ARRIVAL\n\nGuests are prohibited everywhere..\nGuess what! I received one from nowhere.\nIt was a slimy, slidy snail!\nA garden snail!\nEncountered with the slithery snail..\nI stood still for a while.\nAgreed, it is a tiny, teeny harmless creature..\nIt loosens the soil by nature..\nIt's movements are so slow and sticky..\nYet I felt more fussy!\nShould I usher and let it remain...\nOr drive it out of my domain?\nWho knows, it might prove to be lucky!\n\n- Jeyanthi`
+      },
+      {
+        title: "40. CROWDY CLOUD",
+        text: `CROWDY CLOUD\n\nOh! Clumsy cloud...\nStand there still!!\nOh! Crazy cloud....\nStop for a while!\nOh! Creamy cloud....\nStay here to chill!\nOh! Creaky cloud....\nHush your howl!.\nOh! Creepy cloud...\nSlay not by thy yell!\nOh! Crafty cloud...\nHow stunning is your will!\nIt is said...\nEvery cloud has a silver lining.\nLo! You're filled with those, aiming\nTo enlighten us the future, flourishing!\n\n- Jeyanthi`
+      },
+      {
+        title: "41. HONEY BEE",
+        text: `HONEY BEE\n\nHunting for honey...\nA bee entered into my balcony!\nSearching for a good location...\nIt swayed hither thither in desperation.\nSpotting it at close quarters...\nI was still for a while at my garters.\nWondering at its miniature size...\nIn contrast to its huge comb dice!\nBuzzing there helter-skelter...\nCouldn't find a proper shelter.\nGazing at its repeated attempts...\nReminded me of the spider's prompts.\n\n- Jeyanthi`
+      },
+      {
+        title: "42. CHESS",
+        text: `CHESS\n\nChess.. a diplomatic, mind game..\nThat can at a wink change one's fame..\nBoth the Bishops bridge the gap well...\nGuarding the king and queen with their cross quill!\nKnights are patrolling on their rides...\nMarching on their usual L sides..\nRooks are posted at each corner...\nTo defend straight from the invader.\nAs simple as the commons, the Pawns..\nYou never know their politic plans!\nQueen, the only supreme personality...\nAdapts and adjusts with any difficulty,\nIn order to save her king and kingdom...\nBut the King, at his own pace, is propelling his stardom!\nWinners always reach the top..\nLosers never give up..\nAnd quitters can never come up!\n\n- Jeyanthi`
+      },
+      {
+        title: "43. KARGIL DAY... A Tribute! 🌺",
+        text: `KARGIL DAY... A Tribute! 🌺\n\nKargil... the most remembered historical place..\nMakes everyone thrill and amaze!\nThe war frontiers were in a blaze..\nTo safeguard our mother land from the raze!\n\nTheir lives, they didn't even bother..\nUnited to protect our lives rather!\nDare to encounter, the courage they gather..\nNo words indeed to lather!\n\nThe instilled patriotism provoked to fight..\nDenied the intruders at their sight!\nMarvellous was their massive might..\nLaid down their souls, so sad was the plight!\n\nKudos! To thy bravery..\nHere we salute for thine gallantry!\n\n- Jeyanthi`
+      },
+      {
+        title: "44. Tiger, The tremor...",
+        text: `Tiger, The tremor...\n\nFree in the woods..\nSeems to be a terror..\nConfined in a cage..\nShuts all its savage..\nThe familiar fang frets us ferocious.. \nThe serene stripes strike a shiver..\nSliding in the bushes..\nWaiting for its prey and clashes..\nA decade ago when visited Jim Corbet..\nTo explore its existence..\nWith a fusion of thrill and excitement..\nUnfortunately, we were satiated with its footprint..\nRead later, it was at the verge of extinct!\nThe life of our national animal is at stake!\nAnd we are unable to make..\nWild life sanctuaries are at remarks..\nNational Parks add more sparks..\nPoaching and croaching must be stopped..\nThe violators are to be cropped.\n\nLet's protect our pride with dignity..\nAnd preserve it for the posterity!\n\n- Jeyanthi`
+      },
+      {
+        title: "45. Rakshabandhan",
+        text: `Rakshabandhan\n\nSiblings stand for strong bonding..\nSo sensitive and special in blending..\nBorn in the middle with two brothers beloved..\nIs really a boon bestowed by God!\nRemain always as my stepping stones..\nBeing beside in fetching my fortunes.\nMy two terrific but pleasant pillars..\nMinting magic as my healers.\nAssure to accomplish all my aspirations..\nPresent there in all my perspirations!\n\nThanking is so simple..\nGrateful is so meagre..\nNo words to my owes overwhelming!\nExcept praying the best, long and legendary life!\n\n- Jeyanthi`
+      },
+      {
+        title: "46. 'AWE'SPICIOUS AUGUST",
+        text: `'AWE'SPICIOUS AUGUST\n\nWater.. Water... Everywhere....\nWhere would the people take shelter and share?\nShare? No place at all!\nAll the inhabitants are almost homeless..\nHomeless! Indeed, the violent reaction of H2O..\nSo tormenting and compelled to utter oh no!\n\nHow auspicious is this August?\nMany may opine it's too disgust...\nThough this month has witnessed..\nThe birth of Lord Krishna, Lord Ganesha and so on to add!\nAlong with COVID, this devilish downpour..\nHas taken the toll on and left with no more..\n\nNoble Nature.. have mercy on us!\nAfter all, we are your tots!\n\n- Jeyanthi`
+      },
+      {
+        title: "47. ODE TO TEACHERS",
+        text: `ODE TO TEACHERS\n\nLearn to yearn...\nYearn to earn...\nEarn to win...\nWin the heart of the everyone..\nLearning commences from the womb,\nAnd of course culminates at the tomb!\nLearning has no age bar..\nAspire to learn more at par..\nThis learning is possible..\nIndeed with the aid of the mentors capable!\nKudos! to all the nation builders..\nFor making me what I'm!\nThough I possess various designations..\nI wish to be identified as a teacher.\nMy Teachers... My Angels..\n\n- Jeyanthi`
+      },
+      {
+        title: "48. INDEPENDENCE",
+        text: `INDEPENDENCE\n\nIndependence in dwelling...\nIndependence in thinking...\nIndependence in executing...\nIndependence in everything,\nArises along with unity!\nUnited we stand..\nUnited we survive.\nLet's be independent and at the same time\nBe united to fight against the crime!\n\n- Jeyanthi`
+      },
+      {
+        title: "49. My Dreamland",
+        text: `My Dreamland\n\nI wish I could have such a shelter!\nWhere there should be no helter-skelter..\nNeither the Lake Isle of Innisfree..\nNor the Third Level of Charlie.\nNot at all any Utopia..\nWhich may mess with phobia!\nThen what would be the one?\nWhy! It's the home of my very own!\nMy quest is cleared, when would the others?\nNothing can be sorted out by wars.\nBlaring and boasting is of no use..\nBlending and bonding will bring muse.\nQuerying and quarrelling may escalate the gap..\nWhy don't we bridge this with a new app?\nLet peace prevail on the earth!\nLet our posterity enjoy its mirth!\n\n- Jeyanthi`
+      },
+      {
+        title: "50. HEARTY HEART",
+        text: `HEARTY HEART\n\nThe most precious part of the body..\nOften addressed as sweet hearted..\nAt times, metaphorically, lion hearted!\nWhen the heart is cool, we let a smile.\nAnd the smile becomes contagious hail!\n\nThe heart never stops from beating..\nUntil the hale and healthy breathing.\nThe soothing heart softens our attitude...\nIt never let us to be in solitude!\n\nThe pumping blood gets circulated..\nAnd reach all the parts, even isolated!\nIt never shows any discrimination..\nEven after its life's culmination.\n\n- Jeyanthi`
+      },
+      {
+        title: "51. Animal Welfare!",
+        text: `Animal Welfare!\n\nAnimal kingdom has it's own splendour..\nEach one is unique in it's odour.\nYou hold the holistic haven.. \nNeither tattles nor taunts at your tavern!\nYou never act as per tarot..\nBut have a trail of trendy trot.\nPoaching is permanently banned..\nCroaching is crucially abandoned.\nYet you become extinct..\nFrom the world of distinct!\nNature parks and sanctuaries are present..\nTo preserve you from the turbulent!\nTreachery! oh, not at all..\nAvarice! no way you shall!\nLet me be in your jocund company\nLater, I know I have to dwell in my destiny.\n\n- Jeyanthi`
+      },
+      {
+        title: "52. Tribute",
+        text: `Tribute\n\nThe second most Meritorious member in the world..\nWho guarantees a safe and secured life ahead!\nEnnumber of children she tackles each passing year..\nThat instills a stern confidence without any fear.\nShe cherishes the children's growth at all stages..\nThis grand feast fills her diary's pages.\nAmidst the hectic schedule, she manages all with perfection..\nAs she treats it as a noble profession.\nWith the students, we too grow and learn..\nThis is what we all yearn!\nHats off! to all these multitaskers..\nWho act in the students' life as speed breakers!\n\n- Jeyanthi`
+      },
+      {
+        title: "53. IAF",
+        text: `IAF\n\nUp there in the blue sky..\nI often wish to spy.\nAmidst the black and white clouds..\nSwaying with my swinging moods..\nI wish I were a bijou bird!\nSo glad to explore beyond the world.\nOh! this enchanting dream came true..\nWright brothers, all because of you!\nNow this has become one of the major forces..\nThat's added a feather on a nation's resources.\nAir Force Day is celebrated on October Eighth..\nThis year, it is the anniversary of eighty eighth!\nStunning stunts in the mid air..\nMerely make us to utter a wild blare!\nSplendid service, this force renders..\nAnd so is greeted with plentiful ponders.\nIt proves that sky is not the limit..\nAnd none can ever deny the permit!\nWe miss you a lot, Missile Man..\nCome back, if you can!\n\n- Jeyanthi`
+      },
+      {
+        title: "54. Postal Profile",
+        text: `Postal Profile\n\nGone are those glorious days!\nWhen we used to wait by all the ways..\nFor a harbinger, who bridged the gap between relations,\nBy fetching the love and affection from faraway,\nIn the form of post cards or inland letters..\nThat were treated as live with flesh and blood..\nAnd preserved as precious even after reading..\nThe young philatelists fight for the stamps..\nGone are those momentums..\nThat wrought the results of the students..\nA grand salute to all the postal employees.!\n\n- Jeyanthi`
+      },
+      {
+        title: "55. Postal Profile (Duplicate Entry)",
+        text: `Postal Profile\n\nGone are those glorious days!\nWhen we used to wait by all the ways..\nFor a harbinger, who bridged the gap between relations,\nBy fetching the love and affection from faraway,\nIn the form of post cards or inland letters..\nThat were treated as live with flesh and blood..\nAnd preserved as precious even after reading..\nThe young philatelists fight for the stamps..\nGone are those momentums..\nThat wrought the results of the students..\nA grand salute to all the postal employees.!\n\n- Jeyanthi`
+      },
+      {
+        title: "56. Mental Wellbeing",
+        text: `Mental Wellbeing\n\nI wish to be what I am!\nThis mere thought keeps me composed and calm.\nIf I think I can, I can!\nI profess all the pessimistic pressure to ban.\nBalance in mental wellbeing is equally crucial..\nFor everyone to have a serene survival.\nHale in health can hail wealth!\nBut mere richness can never afford good health.\nLet our minds mind their own business!\nRest everything will definitely define our elegance.\nAn idle mind is a devil's workshop..\nLet them engrossed with precious books to cope!\nCan Corona hinder me in anyways?\nNay! instead it has boosted me in all the ways.\n\n- Jeyanthi`
+      },
+      {
+        title: "57. Princely Princesses",
+        text: `Princely Princesses\n\nGlorious girls are indeed a gift..\nYou are unique and amazingly great!\nYou deserve whatever you aspire..\nLet more you possess to inspire.\nLet your smile be contagious!\nAs this sight makes me more courageous.\nYou are free birds to fly high..\nI never let you heave a sigh!\nYou know not how precious you are to me!\nMay all your dreams come true..\nMay you be blessed with the best!\nI long you always to be in my nest.\n\n- Jeyanthi`
+      },
+      {
+        title: "58. Catchy carols..",
+        text: `Catchy carols..\nScintillating stars..\nDecored doors..\nElegant angels..\nDelicious delicacies..\nMeritorious messengers...\nAll are awaiting for your august arrival..\nCome along with Santa..\nShower all with your blissful blessings!\n\n- Jeyanthi`
+      },
+      {
+        title: "59. World Environment Day! 🌍🌱",
+        text: `World Environment Day! 🌍🌱\n\nEnriching our environment..\nExists in everyone's commitment!\nEnsure to plant at least one..\nEnable to endorse a better haven.\nEmpower the ambience with lush green..\nEmbark a new awakening preen!\nEvoke an everlasting inspiration to deploy..\nEpitomise yourself before being an envoy!\nEnvisage an effervescent exponent..\nEureka! all can yell, excellent!\n\n- Jeyanthi`
+      },
+      {
+        title: "60. Pleasure of Reading",
+        text: `Pleasure of Reading\n\nReading makes a person perfect..\nPerfect reading reaps confidence..\nConfident readers gain rare rewards..\nRewarded relish the art of deducing..\nDeduce... Skim... Scan and enjoy!\nJoyful reading rejoice everyone.\nLearn to Read.. Read to Learn..\nRead and Grow!\nHave a Happy Reading Day..\n\n- Jeyanthi`
+      },
+      {
+        title: "61. Musical Miracle",
+        text: `Musical Miracle\n\nMusic.. muses the life's battles..\nEases all the odd obstacles!\nRight from birth to death..\nMusic is blended with mirth!\nEveryone loves to taste this toast..\nAs it can quench all our thirst!\nLet music be the food of love!\nBe the spark in every move..\n\n- Jeyanthi`
+      },
+      {
+        title: "62. Teachers....The True Torch Bearers!",
+        text: `Teachers....The True Torch Bearers!\n\nLighting the lamp of knowledge..\nUplifting many to cross the bridge..\nHolding hand towards the heaven..\nLeading the little ones with light leaps...\nBrimming with brave badges..\nPlaying multifaceted roles...\nBearing the beacon ..\nYou pave the path to your pupils!\nWords wielded verbally can be veracious..\nBut your selfless service is at par excellence!\nKudos! to all the Teaching Community ..\nLet the saga be sanctimonious!\nLet's strive even more in sculpting the samaritors!\n\nHAPPY TEACHERS' DAY!\n\n- Jeyanthi`
+      },
+      {
+        title: "63. Happy Daughters' Day!",
+        text: `Happy Daughters' Day!\n\nDarling Daughters...\nDefinitely are driving drones!\nBlessed I am!\nWith two gentle gems..\nSo serene where they are!\nSo blissful together we're!\nLet our bonding be long-lasting..\nWhat else will I be demanding?\n\n- Jeyanthi`
+      },
+      {
+        title: "64. HAPPY DIWALI FESTIVAL OF LIGHT",
+        text: `HAPPY DIWALI\nFESTIVAL OF LIGHT\n\nLegends lend lasting lessons..\nBe it ballad, fables or fictions.\nAll reiterate, truth ever wins..\nIndeed, get away from all sins!\nEveryone has inside a devil..\nBeware! else will be in peril.\nKindle the kindness..\nTo drive away the darkness!\nLight the lamp of humanity..\nAs we belong to literate community!\nMay this festival of lights..\nFocus on crystal clear sights!\nLet's celebrate safe and secure Diwali!\n\n- Jeyanthi`
+      },
+      {
+        title: "65. Cheer up Children!",
+        text: `Cheer up Children!\n\nChildren, thou art so innocent...\nIt's indeed true, cent percent!\nBorn with bonded brain..\nNever let it be in drain!\nChildhood is the most precious phase...\nA stepping stone, hardships to face.\nLive it to the fullest!\nLearn the legends of the latest.\nCapture the momentous moments...\nThat will be helpful in the later laments.\nYou are the blooming buds in a garden...\nSpreading sweet fragrance in the Eden\nSmile..Smile and keep Smiling!\nHAPPY CHILDREN'S DAY!\n\n- Jeyanthi`
+      },
+      {
+        title: "66. The Fittest Survival!",
+        text: `The Fittest Survival!\n\nNature, as usual nailed me to wonder..\nRandomly sown seed has taken this candour.\nWho taught you to climb, my slender?\nSo securely taken the support you trender!\nYou prove that everything has the right to survive..\nLet's all try this to imbibe!\nIs this defined as survival of fittest?\nAnyhow, if you keep awaken your senses..\nBe sure, at your doorstep, success!\n\n- Jeyanthi`
+      },
+      {
+        title: "67. Relishing the Republic!",
+        text: `Relishing the Republic!\n\nHold the head high..\nWhile saluting the tricolor without fie!\nFeel pride for the perfect nation..\nThat has drafted the longest Constitution!\nEmpower its position globally..\nBy contributing a bit care naturally.\nJustice.. Liberty.. Equality.. Fraternity..\nLet it be availed with utmost clarity!\nThe seventy three word preamble\nStill stands as the best example.\nIt's time to pay our tribute\nTo Pandit Nehru, the Father of Preamble!\nAnd Dr. B. R. Ambedkar,\nThe Father of our Indian Constitution!\n\n- Jeyanthi`
+      },
+      {
+        title: "68. New Year Dawn",
+        text: `Yesteryear had a lot of endurance...\nYet to obtain a bit of assurance!\nPast has been parted with a parabola..\nMay the passive patrimony be transformed into a gala!\n2021 culminated with both ups and downs..\nThe erratic end has earned lessons of mounds..\nLet the positives be perceived..\nAnd the negatives be neglected!\nLet's bid adieu to the past..\nAnd be ready to receive the new cast!\nKindle thy driving force, hope..\nThis incredible ignition is suffice to cope!\nLet's usher the unpredictable future!\nWait and watch, what's all to capture!\n\n- Jeyanthi`
+      },
+      {
+        title: "69. If you think you can, YOU CAN!",
+        text: `If you think you can, YOU CAN!\nIf you can't, then who else can be?\nBe optimistic..\nFocus on your target..\nSuccess will always be yours!\nAll the very best dear children!\n\n- Jeyanthi`
+      },
+      {
+        title: "70. Devoted Night",
+        text: `Good nights make our days good..\nA devoted night definitely diffuse one's mood!\nPromising prayers bring propitious presents..\nLet's celebrate such infinite events!\nThese moments always be memorable..\nAs we all plunge into the ocean of devotion.\nOh Lord! Love thy deciples..\nBestow thine best principles!\nHail us hale and healthy life..\nDrive away the dreary, grave grief.\nWe surrender ourselves at your feet..\nGrant your glance whenever we meet!\n\n- Jeyanthi`
+      },
+      {
+        title: "71. Happy Holi!",
+        text: `Happy Holi!\n\nColours are bright and beautiful..\nThus chill our lives cheerful!\nEach festival fetches a fiction..\nAnd Holi is not at all an exception!\nHiranyakashyap and Holika, Mark!\nAre the characters created to drive away the dark..\nBe patient like Prahalad..\nTowards your duties devoted..\n\nUltimately truth triumphs over evil..\nThe Almighty assures an abode without peril!\nLet's all learn this legendary lesson!\nStay compassionate with every person..\nFolks! life will be more memorable..\nAnd add on all colours adorable!\n\n- Jeyanthi`
+      },
+      {
+        title: "72. Hey Ram! 🙏",
+        text: `Hey Ram! 🙏\n\nYour birth was a blessing..\nTo relieve everyone from cursing..\nYou took ten incarnations..\nTo make lots of renovations..\nThis seventh incarnation you adorn...\nTo vanquish the demon Ravan!\nTo cleanse the devils...\nAnd to save the souls from the perils..\nHey Ram! we beseech you..\nTake the eleventh one,\nTo settle the existing pandemic!\n\n- Jeyanthi`
+      },
+      {
+        title: "73. Earth, thou art personified as mother",
+        text: `Earth, thou art personified as mother..\nMetaphorically known for patience..\nYour patience has made you a real patient!\nToo much of anything\nIs good for nothing!\nReprimanding at times is very necessary,\nTo show the humans adversary.. \nYour outrage can never be gauged..\nHence, forget and forgive the folks grudged..\nAnd keep shining with lush green..\nShowering the fine shelter to the preen..\nNever ever compromise with your supremacy..\nAs this only ensures your elegancy!\n\n- Jeyanthi`
+      },
+      {
+        title: "74. Bidding Adieu!",
+        text: `Bidding Adieu!\n\nFare thee well, Mr. Lawrence!\nAs you are fair enough with thy tolerance.\nSky is not the limit, Mr. Lawrence!\nVenture beyond with blended vigilance.\nKeep smiling forever, Mr. Lawrence!\nLeave behind wherever you go, this fragrance.\nLife is precious, Mr. Lawrence!\nLive it to the fullest with lots of accolades!\nLoads of love and prayers, Mr. Lawrence!\nThis bonding will ever bind you with assurance!\nAll the very best!\n\nMatrix Academy School\nSenior Secondary Section\n\n- Jeyanthi`
+      },
+      {
+        title: "75. Bidding Adieu! (Duplicate Entry)",
+        text: `Bidding Adieu!\n\nFare thee well, Mr. Lawrence!\nAs you are fair enough with thy tolerance.\nSky is not the limit, Mr. Lawrence!\nVenture beyond with blended vigilance.\nKeep smiling forever, Mr. Lawrence!\nLeave behind wherever you go, this fragrance.\nLife is precious, Mr. Lawrence!\nLive it to the fullest with lots of accolades!\nLoads of love and prayers, Mr. Lawrence!\nThis bonding will ever bind you with assurance!\nAll the very best!\n\nMatrix Academy School\nSenior Secondary Section\n\n- Jeyanthi`
+      },
+      {
+        title: "76. BLOOMING BUDS",
+        text: `BLOOMING BUDS\n\nThese blooming buds of bell pepper...\nAre the latest trapper of my temper!\nThe budding.. the blooming.. the flowering..\nEnsures my energy every morning.\nEagerly waiting for the full fledged..\nHanging on its tiny branch!\n\n- Jeyanthi`
+      },
+      {
+        title: "77. LABOUR DAY / Mother!",
+        text: `LABOUR DAY\n\nDo work, get perk..\nFrom this, you never had a jerk!\nLaymen labour and toil..\nEven amidst any turmoil!\nOur homes are fully furnished..\nAs you are tormented and tarnished!\nWork where you have regards..\nNever mind about any rewards!\nKeep craving for your valuable voice..\nKudos! to your selfless service..\n\n- Jeyanthi\n\nMother!\n\nThe very first sound uttered by an infant..\nThat showers an everlasting pleasure instant!\nGod cannot be everywhere..\nSo was created Mother!\nAn angel hailed from heaven..\nA precious treasure preserved at our haven!\nAny role she can play in addition..\nBut none can ever take her position!\nBeauty lies in the eyes of beholder! opines John Keats..\nBut only a mother can bring out the beauty at all states!\nThe only relation that ties from womb to tomb..\n\nMost Optimistic Tender Holistic Elegant Relation!\n\n- Jeyanthi`
+      }
+    ];
+
+    let currentIdx = 0;
+    const p1 = document.getElementById('page1');
+    const p2 = document.getElementById('page2');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const counter = document.getElementById('pageCounter');
+
+    function fillCardContent(element, index) {
+      if (index < 0 || index >= poemsList.length) return;
+      element.innerHTML = `
+        <h2 class="poem-title">${poemsList[index].title}</h2>
+        <div class="poem-content">${poemsList[index].text}</div>
+      `;
+    }
+
+    function syncInterfaceView(isNextAction) {
+      counter.textContent = `Poem ${currentIdx + 1} of ${poemsList.length}`;
+      prevBtn.disabled = currentIdx === 0;
+      nextBtn.disabled = currentIdx === poemsList.length - 1;
+
+      const activeCard = currentIdx % 2 === 0 ? p1 : p2;
+      const hiddenCard = currentIdx % 2 === 0 ? p2 : p1;
+
+      fillCardContent(activeCard, currentIdx);
+
+      if (isNextAction !== undefined) {
+        if (isNextAction) {
+          hiddenCard.classList.add('flipped');
+          hiddenCard.classList.remove('active');
+          activeCard.classList.remove('flipped');
+          activeCard.classList.add('active');
+        } else {
+          hiddenCard.classList.remove('flipped', 'active');
+          activeCard.classList.remove('flipped');
+          activeCard.classList.add('active');
+        }
+      } else {
+        activeCard.classList.add('active');
+        activeCard.classList.remove('flipped');
+        hiddenCard.classList.remove('active', 'flipped');
+      }
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentIdx < poemsList.length - 1) {
+        currentIdx++;
+        syncInterfaceView(true);
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentIdx > 0) {
+        currentIdx--;
+        syncInterfaceView(false);
+      }
+    });
+
+    syncInterfaceView();
+  </script>
+</body>
+</html>
